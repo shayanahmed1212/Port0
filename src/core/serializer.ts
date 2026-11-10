@@ -1,22 +1,40 @@
+const encoder = new TextEncoder();
+
+export function compareByteOrder(a: string, b: string): number {
+  const left = encoder.encode(a);
+  const right = encoder.encode(b);
+  const length = Math.min(left.length, right.length);
+  for (let index = 0; index < length; index += 1) {
+    const difference = left[index]! - right[index]!;
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
 function sortValue(value: unknown): unknown {
   if (Array.isArray(value)) {
-    // arrays of objects with path: sort by path if present
-    if (value.length > 0 && value.every((v) => v && typeof v === "object" && !Array.isArray(v) && "path" in (v as Record<string, unknown>))) {
-      return [...value]
-        .sort((a, b) => {
-          const pa = String((a as Record<string, unknown>).path);
-          const pb = String((b as Record<string, unknown>).path);
-          return pa < pb ? -1 : pa > pb ? 1 : 0;
-        })
-        .map(sortValue);
-    }
-    return value.map(sortValue);
+    const sorted =
+      value.length > 0 &&
+      value.every(
+        (item) => isPlainObject(item) && typeof item.path === "string",
+      )
+        ? [...value].sort((a, b) =>
+            compareByteOrder(
+              (a as Record<string, unknown>).path as string,
+              (b as Record<string, unknown>).path as string,
+            ),
+          )
+        : value;
+    return sorted.map(sortValue);
   }
-  if (value && typeof value === "object") {
-    const obj = value as Record<string, unknown>;
+  if (isPlainObject(value)) {
     const out: Record<string, unknown> = {};
-    for (const key of Object.keys(obj).sort()) {
-      out[key] = sortValue(obj[key]);
+    for (const key of Object.keys(value).sort()) {
+      out[key] = sortValue(value[key]);
     }
     return out;
   }
@@ -24,21 +42,29 @@ function sortValue(value: unknown): unknown {
 }
 
 export function canonicalJson(value: unknown): string {
-  const sorted = sortValue(value);
-  return JSON.stringify(sorted, null, 2) + "\n";
+  return `${JSON.stringify(sortValue(value), null, 2)}\n`;
 }
 
 export async function sha256Hex(text: string): Promise<string> {
-  const data = new TextEncoder().encode(text);
-  const buf = await globalThis.crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
+  const data = encoder.encode(text);
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
 }
 
-export async function computeHash(packetWithoutHash: Record<string, unknown>): Promise<string> {
-  const clone = { ...packetWithoutHash };
-  delete clone.contentHash;
-  const canonical = canonicalJson(clone);
-  return sha256Hex(canonical);
+export async function computeHash(packet: unknown): Promise<string> {
+  const clone = isPlainObject(packet) ? { ...packet } : packet;
+  if (isPlainObject(clone)) {
+    delete clone.contentHash;
+  }
+  return sha256Hex(canonicalJson(clone));
+}
+
+export function normalizeLF(text: string): string {
+  return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
+
+export function byteLength(text: string): number {
+  return encoder.encode(text).length;
 }

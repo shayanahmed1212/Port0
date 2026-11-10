@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prebuild": "pnpm --dir .. build",
     "build": "next build",
+    "predev": "pnpm --dir .. build",
     "dev": "next dev",
+    "pretypecheck": "pnpm --dir .. build",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "start": "next start"
   },

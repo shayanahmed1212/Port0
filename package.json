@@ -1,15 +1,28 @@
 {
-  "name": "Port0",
+  "name": "port0",
   "version": "1.0.0",
-  "description": "",
+  "description": "Capture an in-progress git working tree into a redacted, deterministic handoff packet.",
   "main": "dist/cli/index.js",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build && pnpm test"
   },
-  "keywords": [],
+  "keywords": [
+    "ai",
+    "handoff",
+    "git",
+    "redaction",
+    "cli"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.28.2",
