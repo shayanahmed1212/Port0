@@ -11,7 +11,7 @@ export const RepoStateSchema = z.object({
 
 export const RedactionReportSchema = z.object({
   counts: z.record(z.string(), z.number().int().nonnegative()),
-  denylisted: z.array(z.string()),
+  deniedPaths: z.array(z.string()),
 });
 
 export const BudgetSchema = z.object({
@@ -24,7 +24,7 @@ export const PacketSchema = z.object({
   schemaVersion: z.literal(SchemaVersion),
   repo: RepoStateSchema,
   intent: z.string(),
-  status: z.string(),
+  status: z.array(z.object({ path: z.string(), contentOmitted: z.string().optional() })),
   stagedDiff: z.string(),
   unstagedDiff: z.string(),
   untracked: z.array(z.object({ path: z.string(), content: z.string().optional(), contentOmitted: z.string().optional() })),

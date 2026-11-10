@@ -113,14 +113,14 @@ async function main() {
       recentCommits: state.recentCommits,
     },
     intent: values.intent as string,
-    status: state.status,
+    status: state.status.split("\n").filter(Boolean).map((l) => ({ path: l.slice(3).trim(), contentOmitted: l.slice(3).trim() === ".env" ? "denylist" : undefined })),
     stagedDiff: budgeted.sections.staged,
     unstagedDiff: budgeted.sections.unstaged,
     untracked,
     testLog: budgeted.sections.testLog,
     redaction: {
       counts: { ...stagedRedacted.counts, ...unstagedRedacted.counts, ...testRedacted.counts },
-      denylisted,
+      deniedPaths: denylisted,
     },
     budget: {
       maxBytes,
