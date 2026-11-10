@@ -31,10 +31,11 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/node": "^26.6.6",
+"@types/node": "^20.0.0",
     "fast-check": "^4.10.2",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
+    
   },
   "bin": {
     "port0": "dist/cli/index.js"
