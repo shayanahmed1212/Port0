@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "pnpm --dir .. build",
+"prebuild": "pnpm --dir .. install --frozen-lockfile && pnpm --dir .. build",
     "build": "next build",
     "predev": "pnpm --dir .. build",
     "dev": "next dev",
