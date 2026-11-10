@@ -31,6 +31,6 @@ export async function collectGitState(root: string) {
   const stagedDiff = await git(root, ["diff", "--cached", "--no-ext-diff", "--no-textconv"]);
   const unstagedDiff = await git(root, ["diff", "--no-ext-diff", "--no-textconv"]);
   const untrackedRaw = await git(root, ["ls-files", "--others", "--exclude-standard"]);
-  const untrackedPaths = untrackedRaw.trim().split("\n").filter(Boolean);
+  const untrackedPaths = untrackedRaw.trim().split("\n").filter(Boolean).sort();
   return { branch, head, recentCommits, status, stagedDiff, unstagedDiff, untrackedPaths };
 }

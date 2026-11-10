@@ -19,18 +19,28 @@ async function main() {
       intent: { type: "string", default: "" },
       "test-log": { type: "string" },
       "max-bytes": { type: "string", default: "204800" },
+      stdout: { type: "boolean" },
+      version: { type: "boolean" },
+      help: { type: "boolean" },
     },
     allowPositionals: true,
   });
 
   const cmd = positionals[0];
+  if (values.version) { console.log("1.0.0"); process.exit(0); }
+  if (values.help) { console.log("port0 export|verify|render"); process.exit(0); }
+  if (values.help) { console.log("port0 export|verify|render"); process.exit(0); }
 
   if (cmd === "verify") {
-    // minimal: validate schema + hash
     const fs = await import("node:fs");
     const raw = fs.readFileSync(positionals[1]!, "utf8");
     const parsed = JSON.parse(raw);
     PacketSchema.parse(parsed);
+    const recomputed = await computeHash(parsed);
+    if (recomputed !== parsed.contentHash) {
+      console.error("hash mismatch");
+      process.exit(5);
+    }
     console.log("OK");
     process.exit(0);
   }
@@ -47,15 +57,16 @@ async function main() {
   const root = resolveRoot(values.root as string);
   if (!(await isGitRepo(root))) {
     console.error("Not a git repo");
-    process.exit(1);
+    process.exit(2);
   }
 
   const state = await collectGitState(root);
   const denylisted: string[] = [];
-  const untracked: { path: string; content: string }[] = [];
+  const untracked: { path: string; content?: string; contentOmitted?: string }[] = [];
   for (const p of state.untrackedPaths) {
     if (isDenylistedPath(p)) {
       denylisted.push(p);
+      untracked.push({ path: p, contentOmitted: "denylist" });
       continue;
     }
     const fs = await import("node:fs");
@@ -81,6 +92,10 @@ async function main() {
   const testRedacted = redactText(testLog);
 
   const maxBytes = Number(values["max-bytes"]);
+  if (!Number.isFinite(maxBytes) || maxBytes < 1024) {
+    console.error("invalid max-bytes");
+    process.exit(1);
+  }
   const sections: Record<string, string> = {
     staged: stagedRedacted.text,
     unstaged: unstagedRedacted.text,
@@ -92,7 +107,7 @@ async function main() {
   const packet = {
     schemaVersion: "1",
     repo: {
-      rootName: root.split(/[\\/]/).pop() ?? "repo",
+      name: root.split(/[\\/]/).pop() ?? "repo",
       branch: state.branch,
       head: state.head,
       recentCommits: state.recentCommits,
@@ -108,6 +123,7 @@ async function main() {
       denylisted,
     },
     budget: {
+      maxBytes,
       omittedFiles: budgeted.omittedFiles,
       truncated: budgeted.truncated,
     },
@@ -117,15 +133,17 @@ async function main() {
   const finalPacket = { ...packet, contentHash };
   PacketSchema.parse(finalPacket);
 
-  const outPath = ensureInside(root, values.out as string);
-  writeFile(outPath, canonicalJson(finalPacket));
-
-  if (values.format === "md" || values.format === "both") {
-    const mdPath = outPath.replace(/\.json$/, ".md");
-    writeFile(mdPath, renderMarkdown(finalPacket, "1.0.0"));
+  if (values.stdout) {
+    console.log(renderMarkdown(finalPacket, "1.0.0"));
+  } else {
+    const outPath = ensureInside(root, values.out as string);
+    writeFile(outPath, canonicalJson(finalPacket));
+    if (values.format === "md" || values.format === "both") {
+      const mdPath = outPath.replace(/\.json$/, ".md");
+      writeFile(mdPath, renderMarkdown(finalPacket, "1.0.0"));
+    }
+    console.log(`Wrote ${outPath}`);
   }
-
-  console.log(`Wrote ${outPath}`);
 }
 
 main().catch((e) => {
