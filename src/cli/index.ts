@@ -22,6 +22,7 @@ async function main() {
       stdout: { type: "boolean" },
       version: { type: "boolean" },
       help: { type: "boolean" },
+      quiet: { type: "boolean" },
     },
     allowPositionals: true,
   });
@@ -142,7 +143,13 @@ async function main() {
       const mdPath = outPath.replace(/\.json$/, ".md");
       writeFile(mdPath, renderMarkdown(finalPacket, "1.0.0"));
     }
-    console.log(`Wrote ${outPath}`);
+    if (!values.quiet) {
+    const usedBytes = Buffer.byteLength(canonicalJson(finalPacket));
+    const denied = finalPacket.redaction.deniedPaths.length;
+    const secrets = Object.values(finalPacket.redaction.counts).reduce((a: number, b: number) => a + b, 0);
+    const truncated = finalPacket.budget.truncated.length;
+    process.stderr.write(`Wrote ${values.out ?? "port0-packet.json"} (${(usedBytes / 1024).toFixed(1)} KB of ${((maxBytes) / 1024).toFixed(0)} KB) · ${denied} files denied · ${secrets} secrets redacted · ${truncated} section truncated · sha256 ${finalPacket.contentHash.slice(0, 6)}…\n`);
+  }
   }
 }
 
