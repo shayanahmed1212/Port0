@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --frozen-lockfile --prod=false && pnpm --dir dashboard install --frozen-lockfile --prod=false",
-  "buildCommand": "pnpm --dir dashboard build",
+  "installCommand": "pnpm install --frozen-lockfile --prod=false",
+  "buildCommand": "pnpm run build",
   "framework": "nextjs"
 }
