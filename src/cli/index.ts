@@ -113,7 +113,7 @@ async function main() {
       recentCommits: state.recentCommits,
     },
     intent: values.intent as string,
-    status: state.status.split("\n").filter(Boolean).map((l) => ({ path: l.slice(3).trim(), contentOmitted: l.slice(3).trim() === ".env" ? "denylist" : undefined })),
+    status: state.status.split("\n").filter(Boolean).filter((l) => !/port0-packet/.test(l)).map((l) => ({ path: l.slice(3).trim(), contentOmitted: l.slice(3).trim() === ".env" ? "denylist" : undefined })),
     stagedDiff: budgeted.sections.staged,
     unstagedDiff: budgeted.sections.unstaged,
     untracked,
