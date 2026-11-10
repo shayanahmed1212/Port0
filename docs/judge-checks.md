@@ -34,12 +34,14 @@ Recorded result: **53 passed, 0 failed**.
 
 1. Install Node.js 20+ and pnpm.
 2. Run `pnpm install`.
-3. Run `pnpm build`.
-4. Run `node .\dist\cli\index.js export --format both --intent "Review the current work"`.
-5. Inspect `port0-packet.json` and `port0-packet.md`.
-6. Run `node .\dist\cli\index.js verify .\port0-packet.json`.
-7. Run `node .\dist\cli\index.js render .\port0-packet.json`.
-8. Run `& .\scripts\conformance.ps1` for the full evidence set.
+3. Run `pnpm --dir dashboard install`.
+4. Run `pnpm build`.
+5. Run `pnpm --dir dashboard build`.
+6. Run `node .\dist\cli\index.js export --format both --intent "Review the current work"`.
+7. Inspect `port0-packet.json` and `port0-packet.md`.
+8. Run `node .\dist\cli\index.js verify .\port0-packet.json`.
+9. Run `node .\dist\cli\index.js render .\port0-packet.json`.
+10. Run `& .\scripts\conformance.ps1` for the full evidence set.
 
 The published-package quick start is:
 

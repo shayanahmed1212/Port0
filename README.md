@@ -174,21 +174,23 @@ before output.
 
 1. Install Node.js 20+, pnpm, and Git.
 2. Run `pnpm install`.
-3. Run `pnpm build`.
-4. Run:
+3. Run `pnpm --dir dashboard install`.
+4. Run `pnpm build`.
+5. Run `pnpm --dir dashboard build`.
+6. Run:
 
    ```powershell
    node .\dist\cli\index.js export --format both --intent "Review the current work"
    ```
 
-5. Inspect `port0-packet.json` and `port0-packet.md`.
-6. Run:
+7. Inspect `port0-packet.json` and `port0-packet.md`.
+8. Run:
 
    ```powershell
    node .\dist\cli\index.js verify .\port0-packet.json
    ```
 
-7. Run `& .\scripts\conformance.ps1`.
+9. Run `& .\scripts\conformance.ps1`.
 
 ## Development
 
@@ -204,11 +206,18 @@ Port0 does not require application environment variables. Do not commit local
 ### Tests and checks
 
 ```powershell
+pnpm install
+pnpm --dir dashboard install
 pnpm test
 pnpm typecheck
 pnpm build
+pnpm --dir dashboard build
 & .\scripts\conformance.ps1
 ```
+
+Vercel uses the repository-level [`vercel.json`](vercel.json) to install both
+the CLI and dashboard dependencies, build the shared CLI core first, and then
+run the Next.js dashboard build.
 
 Recorded result: **53 unit tests passed, 53 conformance checks passed, 0
 failures**.
