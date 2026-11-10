@@ -215,9 +215,10 @@ pnpm --dir dashboard build
 & .\scripts\conformance.ps1
 ```
 
-Vercel uses the repository-level [`vercel.json`](vercel.json) to install both
-the CLI and dashboard dependencies, build the shared CLI core first, and then
-run the Next.js dashboard build.
+For Vercel, set the project Root Directory to either the repository root
+(which uses [`vercel.json`](vercel.json)) or `dashboard`. When `dashboard` is
+the Root Directory, its `prebuild` installs the parent CLI dependencies,
+builds the shared CLI core first, and then runs the Next.js dashboard build.
 
 Recorded result: **53 unit tests passed, 53 conformance checks passed, 0
 failures**.
