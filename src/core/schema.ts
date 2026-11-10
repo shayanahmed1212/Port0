@@ -3,7 +3,7 @@ import { z } from "zod";
 export const SchemaVersion = "1" as const;
 
 export const RepoStateSchema = z.object({
-  rootName: z.string(),
+  name: z.string(),
   branch: z.string(),
   head: z.string(),
   recentCommits: z.array(z.string()),
@@ -11,10 +11,11 @@ export const RepoStateSchema = z.object({
 
 export const RedactionReportSchema = z.object({
   counts: z.record(z.string(), z.number().int().nonnegative()),
-  denylisted: z.array(z.string()),
+  deniedPaths: z.array(z.string()),
 });
 
 export const BudgetSchema = z.object({
+  maxBytes: z.number(),
   omittedFiles: z.array(z.string()),
   truncated: z.array(z.string()),
 });
@@ -23,10 +24,10 @@ export const PacketSchema = z.object({
   schemaVersion: z.literal(SchemaVersion),
   repo: RepoStateSchema,
   intent: z.string(),
-  status: z.string(),
+  status: z.array(z.object({ path: z.string(), contentOmitted: z.string().optional() })),
   stagedDiff: z.string(),
   unstagedDiff: z.string(),
-  untracked: z.array(z.object({ path: z.string(), content: z.string() })),
+  untracked: z.array(z.object({ path: z.string(), content: z.string().optional(), contentOmitted: z.string().optional() })),
   testLog: z.string(),
   redaction: RedactionReportSchema,
   budget: BudgetSchema,

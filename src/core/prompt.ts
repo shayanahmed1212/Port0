@@ -20,7 +20,7 @@ ${packet.unstagedDiff}
 ## Untracked files
 ${packet.untracked.map((f: any) => f.path).join("\n")}
 
-Safety: redacted ${JSON.stringify(packet.redaction.counts)}; denylisted ${packet.redaction.denylisted.join(", ")}
+Safety: redacted ${JSON.stringify(packet.redaction.counts)}; denylisted ${packet.redaction.deniedPaths.join(", ")}
 
 ---
 hash: ${packet.contentHash}
