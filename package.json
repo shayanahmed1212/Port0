@@ -2,9 +2,12 @@
   "name": "Port0",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/cli/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +19,12 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
-    "commander": "^15.1.0",
     "fast-check": "^4.10.2",
-    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
-  }
+  },
+  "bin": {
+    "port0": "dist/cli/index.js"
+  },
+  "type": "module"
 }
