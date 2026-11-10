@@ -4,8 +4,8 @@ Complete before 3:00 PM. Submit your final commit hash through the organizers' f
 
 ## Submission details
 
-- **Team name:**
-- **Repository URL:**
+- **Team name:*Hallucinati*
+- **Repository URL:*https://github.com/shayanahmed1212/Port0*
 - **Final commit hash:**
 - **Live URL / install link:**
 - **Submitted at (time):**
