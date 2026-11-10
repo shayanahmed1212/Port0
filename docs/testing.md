@@ -21,9 +21,11 @@ From the repository root:
 
 ```powershell
 pnpm install
+pnpm --dir dashboard install
 pnpm test
 pnpm typecheck
 pnpm build
+pnpm --dir dashboard build
 & .\scripts\conformance.ps1
 ```
 
